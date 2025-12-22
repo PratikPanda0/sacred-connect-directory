@@ -42,22 +42,34 @@ const Announcements = () => {
   const fetchAnnouncements = async () => {
     const { data, error } = await supabase
       .from('announcements')
-      .select(`
-        id,
-        title,
-        content,
-        category,
-        created_at,
-        user_id
-        )
-      `)
+      .select('id, title, content, category, created_at, user_id')
       .eq('status', 'approved')
       .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching announcements:', error);
+      setLoading(false);
+      return;
+    }
+
+    // Fetch profiles for the announcements
+    const userIds = data?.map(a => a.user_id) || [];
+    if (userIds.length > 0) {
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, name, city, country')
+        .in('user_id', userIds);
+
+      const profilesMap = new Map(profilesData?.map(p => [p.user_id, { name: p.name, city: p.city, country: p.country }]) || []);
+
+      const announcementsWithProfiles = (data || []).map(a => ({
+        ...a,
+        profiles: profilesMap.get(a.user_id),
+      }));
+
+      setAnnouncements(announcementsWithProfiles);
     } else {
-      setAnnouncements(data || []);
+      setAnnouncements([]);
     }
     setLoading(false);
   };
