@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,7 +12,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { Save, Loader2, User, Mail, Globe, Link as LinkIcon } from 'lucide-react';
+import { Save, Loader2, User, MapPin, Mail, Phone, Globe, Link as LinkIcon } from 'lucide-react';
 
 const profileSchema = z.object({
   name: z.string().trim().min(2, 'Name is required').max(100),
@@ -183,15 +184,17 @@ const Profile = () => {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <Layout>
+      <div className="container px-4 md:px-8 py-8 md:py-12">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
             <h1 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-2">
@@ -402,7 +405,7 @@ const Profile = () => {
           </form>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

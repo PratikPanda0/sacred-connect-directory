@@ -1,176 +1,167 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
-import { Menu, X, Globe, User, LogOut, Settings } from "lucide-react";
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
+import { Globe, User, LogOut, Shield, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 
 export const Header = () => {
   const { user, signOut, isAdmin, isMember } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isActive = (path: string) => location.pathname === path;
-
   const navLinks = [
-    { path: "/directory", label: "Directory", icon: Globe },
+    { to: '/directory', label: 'Directory' },
+    { to: '/announcements', label: 'Announcements' },
   ];
 
-  return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="font-display text-xl font-semibold text-foreground">
-            Devotee Directory
-          </Link>
+  const isActive = (path: string) => location.pathname === path;
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map(({ path, label }) => (
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between px-4 md:px-8">
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform group-hover:scale-105">
+            <Globe className="h-5 w-5" />
+          </div>
+          <span className="font-serif text-xl font-semibold text-foreground">
+            Spiritual Network
+          </span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive(link.to) ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-3">
+          {user ? (
+            <>
+              {isAdmin && (
+                <Button variant="subtle" size="sm" asChild>
+                  <Link to="/admin">
+                    <Shield className="h-4 w-4 mr-1" />
+                    Admin
+                  </Link>
+                </Button>
+              )}
+              {isMember && (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/profile">
+                    <User className="h-4 w-4 mr-1" />
+                    Profile
+                  </Link>
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={signOut}>
+                <LogOut className="h-4 w-4 mr-1" />
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button variant="default" size="sm" asChild>
+                <Link to="/auth?mode=signup">Join Us</Link>
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden p-2 text-foreground"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-background animate-fade-in">
+          <nav className="container flex flex-col gap-2 p-4">
+            {navLinks.map((link) => (
               <Link
-                key={path}
-                to={path}
-                className={`text-sm font-medium transition-colors ${
-                  isActive(path)
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive(link.to)
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
-                {label}
+                {link.label}
               </Link>
             ))}
-
+            <div className="border-t border-border my-2" />
             {user ? (
               <>
-                {isMember && (
-                  <Link
-                    to="/profile"
-                    className={`text-sm font-medium transition-colors ${
-                      isActive("/profile")
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    My Profile
-                  </Link>
-                )}
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className={`text-sm font-medium transition-colors ${
-                      isActive("/admin")
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted flex items-center gap-2"
                   >
-                    Admin
+                    <Shield className="h-4 w-4" />
+                    Admin Dashboard
                   </Link>
                 )}
-                <Button variant="ghost" size="sm" onClick={signOut} className="gap-2">
+                {isMember && (
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted flex items-center gap-2"
+                  >
+                    <User className="h-4 w-4" />
+                    My Profile
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted flex items-center gap-2 text-left"
+                >
                   <LogOut className="h-4 w-4" />
                   Sign Out
-                </Button>
+                </button>
               </>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button asChild variant="ghost" size="sm">
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link to="/auth">Add Listing</Link>
-                </Button>
-              </div>
+              <>
+                <Link
+                  to="/auth"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/auth?mode=signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground text-center"
+                >
+                  Join Us
+                </Link>
+              </>
             )}
           </nav>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t">
-            <nav className="flex flex-col gap-2">
-              {navLinks.map(({ path, label, icon: Icon }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-                    isActive(path)
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </Link>
-              ))}
-
-              {user ? (
-                <>
-                  {isMember && (
-                    <Link
-                      to="/profile"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-                        isActive("/profile")
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      <User className="h-4 w-4" />
-                      My Profile
-                    </Link>
-                  )}
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-                        isActive("/admin")
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      <Settings className="h-4 w-4" />
-                      Admin
-                    </Link>
-                  )}
-                  <button
-                    onClick={() => {
-                      signOut();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 text-muted-foreground"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <div className="flex flex-col gap-2 px-4 pt-2">
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                      Sign In
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm">
-                    <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                      Add Listing
-                    </Link>
-                  </Button>
-                </div>
-              )}
-            </nav>
-          </div>
-        )}
-      </div>
+      )}
     </header>
   );
 };

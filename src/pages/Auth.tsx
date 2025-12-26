@@ -4,7 +4,8 @@ import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Layout } from '@/components/layout/Layout';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { Globe, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
@@ -104,7 +105,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <Layout>
       <div className="min-h-[calc(100vh-12rem)] flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md animate-scale-in">
           <div className="text-center mb-8">
@@ -219,7 +220,7 @@ const Auth = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

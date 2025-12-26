@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Layout } from '@/components/layout/Layout';
 import { MemberCard } from '@/components/directory/MemberCard';
 import { CountrySelector } from '@/components/directory/CountrySelector';
 import { Input } from '@/components/ui/input';
@@ -76,7 +77,7 @@ const Directory = () => {
   const sortedCities = Object.keys(groupedByCity).sort();
 
   return (
-    <div className="min-h-screen bg-background">
+    <Layout>
       {/* Hero Section */}
       <section className="relative py-16 md:py-20 gradient-subtle border-b border-border/50">
         <div className="container px-4 md:px-8">
@@ -168,7 +169,7 @@ const Directory = () => {
           )}
         </div>
       </section>
-    </div>
+    </Layout>
   );
 };
 
