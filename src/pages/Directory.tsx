@@ -8,6 +8,7 @@ import { Search, Users, MapPin, Loader2 } from 'lucide-react';
 
 interface Profile {
   id: string;
+  user_id: string;
   name: string;
   city: string;
   country: string;
@@ -15,6 +16,7 @@ interface Profile {
   phone: string | null;
   social_links: unknown;
   mission_description: string | null;
+  role?: 'admin' | 'member' | 'viewer';
 }
 
 const Directory = () => {
@@ -47,14 +49,29 @@ const Directory = () => {
       query = query.eq('country', selectedCountry);
     }
 
-    const { data, error } = await query;
+    const { data: profilesData, error } = await query;
 
     if (error) {
       console.error('Error fetching profiles:', error);
-    } else {
-      setProfiles(data || []);
+      setLoading(false);
+      return;
     }
-    
+
+    // Fetch roles for all users
+    const userIds = (profilesData || []).map(p => p.user_id);
+    const { data: rolesData } = await supabase
+      .from('user_roles')
+      .select('user_id, role')
+      .in('user_id', userIds);
+
+    // Map roles to profiles
+    const rolesMap = new Map(rolesData?.map(r => [r.user_id, r.role]) || []);
+    const profilesWithRoles = (profilesData || []).map(p => ({
+      ...p,
+      role: rolesMap.get(p.user_id) || 'member'
+    }));
+
+    setProfiles(profilesWithRoles);
     setLoading(false);
   };
 
@@ -164,6 +181,7 @@ const Directory = () => {
                         phone={profile.phone || undefined}
                         socialLinks={profile.social_links as Record<string, string> || undefined}
                         missionDescription={profile.mission_description || undefined}
+                        role={profile.role}
                       />
                     ))}
                   </div>
