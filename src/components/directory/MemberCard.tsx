@@ -18,6 +18,7 @@ interface MemberCardProps {
   phone?: string;
   socialLinks?: SocialLinks;
   missionDescription?: string;
+  role?: 'admin' | 'member' | 'viewer';
 }
 
 export const MemberCard = ({
@@ -28,8 +29,20 @@ export const MemberCard = ({
   phone,
   socialLinks,
   missionDescription,
+  role = 'member',
 }: MemberCardProps) => {
   const hasSocialLinks = socialLinks && Object.values(socialLinks).some(Boolean);
+
+  const getRoleBadge = () => {
+    switch (role) {
+      case 'admin':
+        return <Badge variant="default" className="bg-primary text-primary-foreground">Admin</Badge>;
+      case 'viewer':
+        return <Badge variant="outline" className="text-muted-foreground">Viewer</Badge>;
+      default:
+        return <Badge variant="secondary" className="bg-saffron-light text-saffron-dark">Member</Badge>;
+    }
+  };
 
   return (
     <Card className="elevated-card group hover:scale-[1.02] transition-all duration-300">
@@ -46,9 +59,7 @@ export const MemberCard = ({
               </span>
             </div>
           </div>
-          <Badge variant="secondary" className="bg-sage-light text-sage-dark">
-            Member
-          </Badge>
+          {getRoleBadge()}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
