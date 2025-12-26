@@ -21,7 +21,7 @@ const Directory = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState('all');
-  const [searchCity, setSearchCity] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [cities, setCities] = useState<string[]>([]);
 
   useEffect(() => {
@@ -58,9 +58,13 @@ const Directory = () => {
     setLoading(false);
   };
 
-  const filteredProfiles = profiles.filter((profile) =>
-    profile.city.toLowerCase().includes(searchCity.toLowerCase())
-  );
+  const filteredProfiles = profiles.filter((profile) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      profile.name.toLowerCase().includes(query) ||
+      profile.city.toLowerCase().includes(query)
+    );
+  });
 
   const groupedByCity = filteredProfiles.reduce<Record<string, Profile[]>>(
     (acc, profile) => {
@@ -107,9 +111,9 @@ const Directory = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search by city..."
-                value={searchCity}
-                onChange={(e) => setSearchCity(e.target.value)}
+                placeholder="Search by name or city..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-card"
               />
             </div>
