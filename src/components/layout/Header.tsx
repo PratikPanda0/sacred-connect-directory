@@ -10,8 +10,11 @@ export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { to: '/directory', label: 'Directory' },
-    { to: '/announcements', label: 'Announcements' },
+    { to: '/', label: 'Home' },
+    ...(user ? [
+      { to: '/directory', label: 'Directory' },
+      { to: '/announcements', label: 'Announcements' },
+    ] : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;

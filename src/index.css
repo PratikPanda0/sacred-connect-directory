@@ -8,142 +8,142 @@
 
 @layer base {
   :root {
-    /* Core palette - ISKCON Saffron & Orange tones */
-    --background: 35 45% 97%;
-    --foreground: 25 30% 12%;
+    /* Core palette - ISKCON Soft Saffron tones */
+    --background: 38 35% 98%;
+    --foreground: 25 25% 15%;
 
-    --card: 35 50% 99%;
-    --card-foreground: 25 30% 12%;
+    --card: 38 40% 99%;
+    --card-foreground: 25 25% 15%;
 
-    --popover: 35 50% 99%;
-    --popover-foreground: 25 30% 12%;
+    --popover: 38 40% 99%;
+    --popover-foreground: 25 25% 15%;
 
-    /* Saffron orange primary */
-    --primary: 25 90% 50%;
-    --primary-foreground: 35 50% 98%;
+    /* Soft saffron primary */
+    --primary: 28 75% 55%;
+    --primary-foreground: 38 50% 99%;
 
     /* Warm cream secondary */
-    --secondary: 35 55% 92%;
-    --secondary-foreground: 25 30% 18%;
+    --secondary: 38 45% 94%;
+    --secondary-foreground: 25 25% 20%;
 
     /* Muted saffron */
-    --muted: 30 30% 92%;
-    --muted-foreground: 25 20% 45%;
+    --muted: 35 25% 93%;
+    --muted-foreground: 25 15% 45%;
 
-    /* Deep orange accent */
-    --accent: 20 85% 60%;
-    --accent-foreground: 35 50% 98%;
+    /* Soft peach accent */
+    --accent: 25 65% 70%;
+    --accent-foreground: 25 30% 15%;
 
     --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 35% 85%;
-    --input: 30 35% 85%;
-    --ring: 25 90% 50%;
+    --border: 35 30% 88%;
+    --input: 35 30% 88%;
+    --ring: 28 75% 55%;
 
     --radius: 0.75rem;
 
     /* Custom ISKCON tokens */
-    --saffron: 25 90% 50%;
-    --saffron-light: 30 60% 92%;
-    --saffron-dark: 20 85% 40%;
+    --saffron: 28 75% 55%;
+    --saffron-light: 35 50% 94%;
+    --saffron-dark: 25 70% 45%;
     
-    --earth: 25 35% 30%;
-    --earth-light: 30 40% 94%;
+    --earth: 25 30% 35%;
+    --earth-light: 35 35% 95%;
     
-    --gold: 42 75% 55%;
-    --gold-light: 42 70% 85%;
-    --gold-glow: 38 80% 65%;
+    --gold: 42 65% 58%;
+    --gold-light: 42 55% 88%;
+    --gold-glow: 40 70% 70%;
     
-    --cream: 35 50% 96%;
-    --cream-dark: 32 30% 90%;
+    --cream: 38 45% 97%;
+    --cream-dark: 35 25% 92%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(25 90% 50% / 0.9), hsl(20 85% 40% / 0.95));
-    --gradient-card: linear-gradient(180deg, hsl(35 50% 99%), hsl(35 45% 97%));
-    --gradient-subtle: linear-gradient(135deg, hsl(35 50% 96%), hsl(35 55% 92%));
-    --gradient-gold: linear-gradient(135deg, hsl(25 90% 50%), hsl(42 75% 55%));
+    --gradient-hero: linear-gradient(135deg, hsl(28 75% 55% / 0.85), hsl(25 70% 45% / 0.9));
+    --gradient-card: linear-gradient(180deg, hsl(38 40% 99%), hsl(38 35% 97%));
+    --gradient-subtle: linear-gradient(135deg, hsl(38 45% 97%), hsl(38 45% 94%));
+    --gradient-gold: linear-gradient(135deg, hsl(28 75% 55%), hsl(42 65% 58%));
 
     /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(25 90% 50% / 0.12);
-    --shadow-card: 0 2px 12px -2px hsl(25 30% 15% / 0.08);
-    --shadow-elevated: 0 12px 40px -12px hsl(25 90% 50% / 0.18);
-    --shadow-glow: 0 0 30px hsl(25 90% 50% / 0.25);
+    --shadow-soft: 0 4px 20px -4px hsl(28 75% 55% / 0.1);
+    --shadow-card: 0 2px 12px -2px hsl(25 25% 15% / 0.06);
+    --shadow-elevated: 0 12px 40px -12px hsl(28 75% 55% / 0.15);
+    --shadow-glow: 0 0 30px hsl(28 75% 55% / 0.2);
 
     /* Typography */
     --font-serif: 'Cormorant Garamond', Georgia, serif;
     --font-sans: 'Inter', system-ui, sans-serif;
 
-    --sidebar-background: 35 45% 97%;
-    --sidebar-foreground: 25 30% 12%;
-    --sidebar-primary: 25 90% 50%;
-    --sidebar-primary-foreground: 35 50% 98%;
-    --sidebar-accent: 35 55% 92%;
-    --sidebar-accent-foreground: 25 30% 18%;
-    --sidebar-border: 30 35% 85%;
-    --sidebar-ring: 25 90% 50%;
+    --sidebar-background: 38 35% 98%;
+    --sidebar-foreground: 25 25% 15%;
+    --sidebar-primary: 28 75% 55%;
+    --sidebar-primary-foreground: 38 50% 99%;
+    --sidebar-accent: 38 45% 94%;
+    --sidebar-accent-foreground: 25 25% 20%;
+    --sidebar-border: 35 30% 88%;
+    --sidebar-ring: 28 75% 55%;
   }
 
   .dark {
-    --background: 25 20% 8%;
-    --foreground: 35 30% 95%;
+    --background: 25 18% 8%;
+    --foreground: 38 25% 95%;
 
-    --card: 25 18% 12%;
-    --card-foreground: 35 30% 95%;
+    --card: 25 15% 12%;
+    --card-foreground: 38 25% 95%;
 
-    --popover: 25 18% 12%;
-    --popover-foreground: 35 30% 95%;
+    --popover: 25 15% 12%;
+    --popover-foreground: 38 25% 95%;
 
-    --primary: 25 85% 55%;
-    --primary-foreground: 25 20% 8%;
+    --primary: 28 70% 58%;
+    --primary-foreground: 25 18% 8%;
 
-    --secondary: 25 18% 18%;
-    --secondary-foreground: 35 30% 90%;
+    --secondary: 25 15% 18%;
+    --secondary-foreground: 38 25% 90%;
 
-    --muted: 25 15% 20%;
-    --muted-foreground: 35 20% 60%;
+    --muted: 25 12% 20%;
+    --muted-foreground: 38 18% 60%;
 
-    --accent: 20 80% 55%;
-    --accent-foreground: 25 20% 8%;
+    --accent: 25 60% 60%;
+    --accent-foreground: 25 18% 8%;
 
     --destructive: 0 60% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 25 15% 22%;
-    --input: 25 15% 22%;
-    --ring: 25 85% 55%;
+    --border: 25 12% 22%;
+    --input: 25 12% 22%;
+    --ring: 28 70% 58%;
 
-    --saffron: 25 85% 55%;
-    --saffron-light: 25 40% 22%;
-    --saffron-dark: 20 80% 45%;
+    --saffron: 28 70% 58%;
+    --saffron-light: 25 35% 22%;
+    --saffron-dark: 25 65% 48%;
     
-    --earth: 25 25% 50%;
-    --earth-light: 25 18% 18%;
+    --earth: 25 22% 50%;
+    --earth-light: 25 15% 18%;
     
-    --gold: 42 70% 55%;
-    --gold-light: 42 45% 25%;
-    --gold-glow: 38 75% 55%;
+    --gold: 42 60% 55%;
+    --gold-light: 42 40% 25%;
+    --gold-glow: 40 65% 58%;
     
-    --cream: 25 18% 15%;
-    --cream-dark: 25 15% 12%;
+    --cream: 25 15% 15%;
+    --cream-dark: 25 12% 12%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(25 85% 55% / 0.9), hsl(20 80% 45% / 0.95));
-    --gradient-card: linear-gradient(180deg, hsl(25 18% 12%), hsl(25 20% 8%));
-    --gradient-subtle: linear-gradient(135deg, hsl(25 18% 15%), hsl(25 18% 18%));
+    --gradient-hero: linear-gradient(135deg, hsl(28 70% 58% / 0.85), hsl(25 65% 48% / 0.9));
+    --gradient-card: linear-gradient(180deg, hsl(25 15% 12%), hsl(25 18% 8%));
+    --gradient-subtle: linear-gradient(135deg, hsl(25 15% 15%), hsl(25 15% 18%));
 
     --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.35);
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.25);
     --shadow-elevated: 0 12px 40px -12px hsl(0 0% 0% / 0.45);
-    --shadow-glow: 0 0 30px hsl(25 85% 55% / 0.2);
+    --shadow-glow: 0 0 30px hsl(28 70% 58% / 0.18);
 
-    --sidebar-background: 25 20% 8%;
-    --sidebar-foreground: 35 30% 95%;
-    --sidebar-primary: 25 85% 55%;
-    --sidebar-primary-foreground: 25 20% 8%;
-    --sidebar-accent: 25 18% 18%;
-    --sidebar-accent-foreground: 35 30% 90%;
-    --sidebar-border: 25 15% 22%;
-    --sidebar-ring: 25 85% 55%;
+    --sidebar-background: 25 18% 8%;
+    --sidebar-foreground: 38 25% 95%;
+    --sidebar-primary: 28 70% 58%;
+    --sidebar-primary-foreground: 25 18% 8%;
+    --sidebar-accent: 25 15% 18%;
+    --sidebar-accent-foreground: 38 25% 90%;
+    --sidebar-border: 25 12% 22%;
+    --sidebar-ring: 28 70% 58%;
   }
 }
 
