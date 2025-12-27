@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
-import { Globe, User, LogOut, Shield, Menu, X } from 'lucide-react';
+import { User, LogOut, Shield, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import iskconLogo from '@/assets/iskcon-logo.png';
 
 export const Header = () => {
   const { user, signOut, isAdmin, isMember } = useAuth();
@@ -23,11 +24,13 @@ export const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8">
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform group-hover:scale-105">
-            <Globe className="h-5 w-5" />
-          </div>
+          <img 
+            src={iskconLogo} 
+            alt="ISKCON Logo" 
+            className="h-10 w-10 transition-transform group-hover:scale-105"
+          />
           <span className="font-serif text-xl font-semibold text-foreground">
-            Spiritual Network
+            Sacred Connect
           </span>
         </Link>
 
