@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
 import { Globe, Users, Megaphone, Shield, ArrowRight, Sparkles } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
 const Index = () => {
+  const { user, hasProfile } = useAuth();
   const features = [
     {
       icon: Globe,
@@ -112,12 +114,14 @@ const Index = () => {
               Join our growing community of spiritual practitioners, healers, and seekers from around the world.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button variant="default" size="lg" asChild>
-                <Link to="/auth?mode=signup">
-                  Create Your Profile
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
+              {!hasProfile && (
+                <Button variant="default" size="lg" asChild>
+                  <Link to={user ? "/profile" : "/auth?mode=signup"}>
+                    Create Your Profile
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Link>
+                </Button>
+              )}
               <Button variant="outline" size="lg" asChild>
                 <Link to="/announcements">View Announcements</Link>
               </Button>
