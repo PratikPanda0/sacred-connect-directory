@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
@@ -6,13 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { CountrySelector } from '@/components/directory/CountrySelector';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { Save, Loader2, User, MapPin, Mail, Phone, Globe, Link as LinkIcon } from 'lucide-react';
+import { Save, Loader2, User, MapPin, Mail, Phone, Globe, Link as LinkIcon, Camera, Trash2 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const profileSchema = z.object({
   name: z.string().trim().min(2, 'Name is required').max(100),
@@ -28,13 +38,22 @@ const profileSchema = z.object({
 });
 
 const Profile = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // Delete confirmation states
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showNameConfirm, setShowNameConfirm] = useState(false);
+  const [deleteNameInput, setDeleteNameInput] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -43,7 +62,6 @@ const Profile = () => {
     email: '',
     phone: '',
     mission_description: '',
-    is_public: true,
     website: '',
     linkedin: '',
     facebook: '',
@@ -75,6 +93,7 @@ const Profile = () => {
       console.error('Error fetching profile:', error);
     } else if (data) {
       setHasProfile(true);
+      setAvatarUrl(data.avatar_url || null);
       const socialLinks = data.social_links as Record<string, string> | null;
       setFormData({
         name: data.name || '',
@@ -83,7 +102,6 @@ const Profile = () => {
         email: data.email || '',
         phone: data.phone || '',
         mission_description: data.mission_description || '',
-        is_public: data.is_public ?? true,
         website: socialLinks?.website || '',
         linkedin: socialLinks?.linkedin || '',
         facebook: socialLinks?.facebook || '',
@@ -126,6 +144,60 @@ const Profile = () => {
     return true;
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be less than 2MB');
+      return;
+    }
+
+    setUploadingAvatar(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile with avatar URL
+      if (hasProfile) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      }
+
+      setAvatarUrl(publicUrl);
+      toast.success('Profile picture updated!');
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -152,8 +224,8 @@ const Profile = () => {
       email: formData.email || null,
       phone: formData.phone || null,
       mission_description: formData.mission_description || null,
-      is_public: formData.is_public,
       social_links: socialLinks,
+      avatar_url: avatarUrl,
     };
 
     let error;
@@ -182,6 +254,62 @@ const Profile = () => {
     setSaving(false);
   };
 
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setShowDeleteConfirm(false);
+    setShowNameConfirm(true);
+    setDeleteNameInput('');
+  };
+
+  const handleFinalDelete = async () => {
+    if (deleteNameInput.trim().toLowerCase() !== formData.name.trim().toLowerCase()) {
+      toast.error('Name does not match. Please enter your exact name.');
+      return;
+    }
+
+    if (!user) return;
+
+    setDeleting(true);
+
+    try {
+      // Delete profile first
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (profileError) throw profileError;
+
+      // Delete user roles
+      const { error: rolesError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (rolesError) throw rolesError;
+
+      // Delete avatar from storage if exists
+      if (avatarUrl) {
+        await supabase.storage
+          .from('avatars')
+          .remove([`${user.id}/avatar.png`, `${user.id}/avatar.jpg`, `${user.id}/avatar.jpeg`, `${user.id}/avatar.webp`]);
+      }
+
+      toast.success('Your account has been deleted.');
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast.error('Failed to delete account. Please try again.');
+    } finally {
+      setDeleting(false);
+      setShowNameConfirm(false);
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <Layout>
@@ -208,6 +336,56 @@ const Profile = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Profile Picture */}
+            <Card className="elevated-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="h-5 w-5 text-primary" />
+                  Profile Picture
+                </CardTitle>
+                <CardDescription>
+                  Upload a photo for your profile
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-6">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24">
+                      <AvatarImage src={avatarUrl || undefined} alt={formData.name} />
+                      <AvatarFallback className="text-2xl">
+                        {formData.name.slice(0, 2).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    {uploadingAvatar && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingAvatar}
+                    >
+                      {uploadingAvatar ? 'Uploading...' : 'Choose Photo'}
+                    </Button>
+                    <p className="text-sm text-muted-foreground">
+                      JPG, PNG or WebP. Max 2MB.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Basic Info */}
             <Card className="elevated-card">
               <CardHeader>
@@ -371,27 +549,6 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Privacy */}
-            <Card className="elevated-card">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="is_public" className="text-base font-medium">
-                      Public Profile
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      Make your profile visible in the directory
-                    </p>
-                  </div>
-                  <Switch
-                    id="is_public"
-                    checked={formData.is_public}
-                    onCheckedChange={(checked) => handleChange('is_public', checked)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
             <Button type="submit" size="lg" className="w-full" disabled={saving}>
               {saving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -402,9 +559,81 @@ const Profile = () => {
                 </>
               )}
             </Button>
+
+            {/* Delete Account */}
+            {hasProfile && (
+              <Card className="elevated-card border-destructive/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-destructive">Delete Account</p>
+                      <p className="text-sm text-muted-foreground">
+                        Permanently delete your profile and all associated data
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={handleDeleteClick}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </form>
         </div>
       </div>
+
+      {/* First Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. Your profile and all associated data will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Yes, Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Name Confirmation Dialog */}
+      <AlertDialog open={showNameConfirm} onOpenChange={setShowNameConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please type your name <span className="font-semibold text-foreground">"{formData.name}"</span> to confirm deletion.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Input
+              value={deleteNameInput}
+              onChange={(e) => setDeleteNameInput(e.target.value)}
+              placeholder="Enter your name"
+              autoFocus
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={handleFinalDelete}
+              disabled={deleting || deleteNameInput.trim().toLowerCase() !== formData.name.trim().toLowerCase()}
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Delete Account'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 };
