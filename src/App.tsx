@@ -35,9 +35,11 @@ const App = () => (
             <Route path="/guidelines" element={<Guidelines />} />
             <Route path="/contact" element={<Contact />} />
             
-            {/* Devotee routes - requires member or admin role */}
+            {/* Profile route - requires authentication but NOT a profile (so users can create one) */}
+            <Route path="/profile" element={<Profile />} />
+            
+            {/* Devotee routes - requires authentication AND a profile */}
             <Route path="/directory" element={<DevoteeRoute><Directory /></DevoteeRoute>} />
-            <Route path="/profile" element={<DevoteeRoute><Profile /></DevoteeRoute>} />
             <Route path="/announcements" element={<DevoteeRoute><Announcements /></DevoteeRoute>} />
             <Route path="/announcements/new" element={<DevoteeRoute><NewAnnouncement /></DevoteeRoute>} />
             

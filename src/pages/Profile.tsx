@@ -38,7 +38,7 @@ const profileSchema = z.object({
 });
 
 const Profile = () => {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading, signOut, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -248,6 +248,7 @@ const Profile = () => {
       toast.error('Failed to save profile. Please try again.');
     } else {
       setHasProfile(true);
+      await refreshProfile(); // Update auth context so navigation works
       toast.success('Profile saved successfully!');
     }
 
