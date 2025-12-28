@@ -14,6 +14,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   roleId: number | null;
+  hasProfile: boolean;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -28,8 +29,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [roleId, setRoleId] = useState<number | null>(null);
+  const [hasProfile, setHasProfile] = useState(false);
 
-  const fetchUserRole = async (userId: string) => {
+  const fetchUserProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -38,14 +40,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user role:', error);
-        return null;
+        console.error('Error fetching user profile:', error);
+        return { roleId: null, exists: false };
       }
 
-      return data?.role_id as number | null;
+      return { 
+        roleId: data?.role_id as number | null, 
+        exists: !!data 
+      };
     } catch (error) {
-      console.error('Error fetching user role:', error);
-      return null;
+      console.error('Error fetching user profile:', error);
+      return { roleId: null, exists: false };
     }
   };
 
@@ -56,13 +61,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer role fetching to avoid deadlock
+        // Defer profile fetching to avoid deadlock
         if (session?.user) {
           setTimeout(() => {
-            fetchUserRole(session.user.id).then(setRoleId);
+            fetchUserProfile(session.user.id).then(({ roleId, exists }) => {
+              setRoleId(roleId);
+              setHasProfile(exists);
+            });
           }, 0);
         } else {
           setRoleId(null);
+          setHasProfile(false);
         }
         
         setLoading(false);
@@ -75,7 +84,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserRole(session.user.id).then(setRoleId);
+        fetchUserProfile(session.user.id).then(({ roleId, exists }) => {
+          setRoleId(roleId);
+          setHasProfile(exists);
+        });
       }
       
       setLoading(false);
@@ -113,6 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     await supabase.auth.signOut();
     setRoleId(null);
+    setHasProfile(false);
   };
 
   const isAdmin = roleId === ROLE_IDS.ADMIN;
@@ -125,6 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         session,
         loading,
         roleId,
+        hasProfile,
         signUp,
         signIn,
         signOut,
