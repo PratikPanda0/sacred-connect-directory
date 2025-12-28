@@ -16,6 +16,7 @@ interface Profile {
   phone: string | null;
   social_links: unknown;
   mission_description: string | null;
+  avatar_url: string | null;
   role?: 'admin' | 'member' | 'viewer';
 }
 
@@ -182,6 +183,7 @@ const Directory = () => {
                         socialLinks={profile.social_links as Record<string, string> || undefined}
                         missionDescription={profile.mission_description || undefined}
                         role={profile.role}
+                        avatarUrl={profile.avatar_url || undefined}
                       />
                     ))}
                   </div>
