@@ -283,13 +283,7 @@ const Profile = () => {
 
       if (profileError) throw profileError;
 
-      // Delete user roles
-      const { error: rolesError } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (rolesError) throw rolesError;
+      // No need to delete from user_roles table anymore - role is stored in profiles
 
       // Delete avatar from storage if exists
       if (avatarUrl) {

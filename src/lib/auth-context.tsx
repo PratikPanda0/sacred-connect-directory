@@ -2,13 +2,18 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
-type UserRole = 'admin' | 'member' | 'viewer';
+// Role IDs from the roles table
+const ROLE_IDS = {
+  BASIC: 1,
+  DEVOTEE: 2,
+  ADMIN: 3,
+} as const;
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  userRole: UserRole | null;
+  roleId: number | null;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -22,13 +27,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [roleId, setRoleId] = useState<number | null>(null);
 
   const fetchUserRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
+        .from('profiles')
+        .select('role_id')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -37,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return null;
       }
 
-      return data?.role as UserRole | null;
+      return data?.role_id as number | null;
     } catch (error) {
       console.error('Error fetching user role:', error);
       return null;
@@ -54,10 +59,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Defer role fetching to avoid deadlock
         if (session?.user) {
           setTimeout(() => {
-            fetchUserRole(session.user.id).then(setUserRole);
+            fetchUserRole(session.user.id).then(setRoleId);
           }, 0);
         } else {
-          setUserRole(null);
+          setRoleId(null);
         }
         
         setLoading(false);
@@ -70,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserRole(session.user.id).then(setUserRole);
+        fetchUserRole(session.user.id).then(setRoleId);
       }
       
       setLoading(false);
@@ -107,11 +112,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setUserRole(null);
+    setRoleId(null);
   };
 
-  const isAdmin = userRole === 'admin';
-  const isDevotee = userRole === 'member' || userRole === 'admin';
+  const isAdmin = roleId === ROLE_IDS.ADMIN;
+  const isDevotee = roleId === ROLE_IDS.DEVOTEE || roleId === ROLE_IDS.ADMIN;
 
   return (
     <AuthContext.Provider
@@ -119,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         session,
         loading,
-        userRole,
+        roleId,
         signUp,
         signIn,
         signOut,
