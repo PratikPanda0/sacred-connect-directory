@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Guidelines from "./pages/Guidelines";
 import Directory from "./pages/Directory";
 import Profile from "./pages/Profile";
 import Announcements from "./pages/Announcements";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/about" element={<About />} />
+            <Route path="/guidelines" element={<Guidelines />} />
             <Route path="/contact" element={<Contact />} />
             
             {/* Devotee routes - requires member or admin role */}

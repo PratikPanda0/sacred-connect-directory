@@ -25,9 +25,9 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const profileSchema = z.object({
-  name: z.string().trim().min(2, 'Name is required').max(100),
+  name: z.string().trim().max(100).optional().or(z.literal('')),
   country: z.string().min(1, 'Country is required'),
-  city: z.string().trim().min(1, 'City is required').max(100),
+  city: z.string().trim().max(100).optional().or(z.literal('')),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().max(20).optional().or(z.literal('')),
   mission_description: z.string().max(1000).optional().or(z.literal('')),
@@ -218,9 +218,9 @@ const Profile = () => {
 
     const profileData = {
       user_id: user.id,
-      name: formData.name.trim(),
+      name: formData.name.trim() || null,
       country: formData.country,
-      city: formData.city.trim(),
+      city: formData.city.trim() || null,
       email: formData.email || null,
       phone: formData.phone || null,
       mission_description: formData.mission_description || null,
@@ -393,14 +393,17 @@ const Profile = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name *</Label>
+                  <Label htmlFor="name">Display Name</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    placeholder="Your full name"
+                    placeholder="Your name or initiated name (optional)"
                   />
                   {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                  <p className="text-xs text-muted-foreground">
+                    You can use your initiated name or remain anonymous
+                  </p>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -414,12 +417,12 @@ const Profile = () => {
                     {errors.country && <p className="text-sm text-destructive">{errors.country}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
+                    <Label htmlFor="city">City</Label>
                     <Input
                       id="city"
                       value={formData.city}
                       onChange={(e) => handleChange('city', e.target.value)}
-                      placeholder="Your city"
+                      placeholder="Your city (optional)"
                     />
                     {errors.city && <p className="text-sm text-destructive">{errors.city}</p>}
                   </div>
