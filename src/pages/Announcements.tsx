@@ -31,7 +31,7 @@ const categoryColors: Record<string, string> = {
 };
 
 const Announcements = () => {
-  const { user, isMember } = useAuth();
+  const { user, isDevotee } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,7 +88,7 @@ const Announcements = () => {
                 Discover collaboration opportunities, project updates, and community news from our members.
               </p>
             </div>
-            {isMember && (
+            {isDevotee && (
               <Button asChild size="lg">
                 <Link to="/announcements/new">
                   <Plus className="h-4 w-4 mr-2" />
@@ -116,7 +116,7 @@ const Announcements = () => {
               <p className="text-muted-foreground mb-6">
                 Be the first to share something with the community!
               </p>
-              {isMember && (
+              {isDevotee && (
                 <Button asChild>
                   <Link to="/announcements/new">
                     <Plus className="h-4 w-4 mr-2" />
