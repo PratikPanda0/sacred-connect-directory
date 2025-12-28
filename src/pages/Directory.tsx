@@ -17,7 +17,7 @@ interface Profile {
   id: string;
   user_id: string;
   name: string;
-  city: string;
+  city: string | null;
   country: string;
   email: string | null;
   phone: string | null;
@@ -39,9 +39,9 @@ const Directory = () => {
   }, [selectedCountry]);
 
   useEffect(() => {
-    // Extract unique cities from profiles
-    const uniqueCities = [...new Set(profiles.map((p) => p.city))].sort();
-    setCities(uniqueCities);
+    // Extract unique location labels (city or country if city is null)
+    const uniqueLocations = [...new Set(profiles.map((p) => p.city || p.country))].sort();
+    setCities(uniqueLocations);
   }, [profiles]);
 
   const fetchProfiles = async () => {
@@ -71,25 +71,44 @@ const Directory = () => {
 
   const filteredProfiles = profiles.filter((profile) => {
     const query = searchQuery.toLowerCase();
+    const locationLabel = profile.city || profile.country;
     return (
-      profile.name.toLowerCase().includes(query) ||
-      profile.city.toLowerCase().includes(query)
+      (profile.name?.toLowerCase() || '').includes(query) ||
+      locationLabel.toLowerCase().includes(query)
     );
   });
 
-  const groupedByCity = filteredProfiles.reduce<Record<string, Profile[]>>(
+  // Group by country first, then by city within country
+  const groupedByCountryAndCity = filteredProfiles.reduce<Record<string, Record<string, Profile[]>>>(
     (acc, profile) => {
-      const city = profile.city;
-      if (!acc[city]) {
-        acc[city] = [];
+      const country = profile.country;
+      const city = profile.city || country; // Use country as label if no city
+      
+      if (!acc[country]) {
+        acc[country] = {};
       }
-      acc[city].push(profile);
+      if (!acc[country][city]) {
+        acc[country][city] = [];
+      }
+      acc[country][city].push(profile);
       return acc;
     },
     {}
   );
 
-  const sortedCities = Object.keys(groupedByCity).sort();
+  // Sort countries alphabetically
+  const sortedCountries = Object.keys(groupedByCountryAndCity).sort();
+
+  // For each country, sort cities with country-name-group first (no city), then alphabetically
+  const getSortedCitiesForCountry = (country: string) => {
+    const cities = Object.keys(groupedByCountryAndCity[country]);
+    return cities.sort((a, b) => {
+      // Country name (no city) comes first
+      if (a === country) return -1;
+      if (b === country) return 1;
+      return a.localeCompare(b);
+    });
+  };
 
   return (
     <Layout>
@@ -139,7 +158,7 @@ const Directory = () => {
             <div className="flex items-center justify-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : sortedCities.length === 0 ? (
+          ) : sortedCountries.length === 0 ? (
             <div className="text-center py-20">
               <Users className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
               <h3 className="font-serif text-xl font-medium text-foreground mb-2">
@@ -152,32 +171,48 @@ const Directory = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-12">
-              {sortedCities.map((city) => (
-                <div key={city} className="animate-fade-in">
-                  <div className="flex items-center gap-2 mb-6">
-                    <MapPin className="h-5 w-5 text-primary" />
-                    <h2 className="font-serif text-2xl font-semibold text-foreground">
-                      {city}
-                    </h2>
-                    <span className="text-sm text-muted-foreground ml-2">
-                      ({groupedByCity[city].length} member{groupedByCity[city].length !== 1 ? 's' : ''})
-                    </span>
-                  </div>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {groupedByCity[city].map((profile) => (
-                      <MemberCard
-                        key={profile.id}
-                        name={profile.name}
-                        city={profile.city}
-                        country={profile.country}
-                        email={profile.email || undefined}
-                        phone={profile.phone || undefined}
-                        socialLinks={profile.social_links as Record<string, string> || undefined}
-                        missionDescription={profile.mission_description || undefined}
-                        roleId={profile.role_id}
-                        avatarUrl={profile.avatar_url || undefined}
-                      />
+            <div className="space-y-16">
+              {sortedCountries.map((country) => (
+                <div key={country} className="animate-fade-in">
+                  {/* Country Header - only show if viewing all countries */}
+                  {selectedCountry === 'all' && (
+                    <div className="mb-8">
+                      <h2 className="font-serif text-3xl font-semibold text-foreground border-b border-border pb-3">
+                        {country}
+                      </h2>
+                    </div>
+                  )}
+                  
+                  {/* Cities within the country */}
+                  <div className="space-y-10">
+                    {getSortedCitiesForCountry(country).map((city) => (
+                      <div key={city} className="animate-fade-in">
+                        <div className="flex items-center gap-2 mb-6">
+                          <MapPin className="h-5 w-5 text-primary" />
+                          <h3 className="font-serif text-2xl font-semibold text-foreground">
+                            {city}
+                          </h3>
+                          <span className="text-sm text-muted-foreground ml-2">
+                            ({groupedByCountryAndCity[country][city].length} member{groupedByCountryAndCity[country][city].length !== 1 ? 's' : ''})
+                          </span>
+                        </div>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {groupedByCountryAndCity[country][city].map((profile) => (
+                            <MemberCard
+                              key={profile.id}
+                              name={profile.name || 'Anonymous'}
+                              city={profile.city || profile.country}
+                              country={profile.country}
+                              email={profile.email || undefined}
+                              phone={profile.phone || undefined}
+                              socialLinks={profile.social_links as Record<string, string> || undefined}
+                              missionDescription={profile.mission_description || undefined}
+                              roleId={profile.role_id}
+                              avatarUrl={profile.avatar_url || undefined}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
