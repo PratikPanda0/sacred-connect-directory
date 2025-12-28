@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent } from '@/components/ui/card';
 import { Layout } from '@/components/layout/Layout';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -17,6 +18,15 @@ const signInSchema = z.object({
 
 const signUpSchema = signInSchema.extend({
   name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
+  agreeDiksa: z.literal(true, {
+    errorMap: () => ({ message: 'You must accept Srila Prabhupada as your diksa guru' }),
+  }),
+  agreeBooks: z.literal(true, {
+    errorMap: () => ({ message: 'You must agree to follow pre-1978 books' }),
+  }),
+  agreeGuidelines: z.literal(true, {
+    errorMap: () => ({ message: 'You must agree to the community guidelines' }),
+  }),
 });
 
 const Auth = () => {
@@ -25,6 +35,9 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [agreeDiksa, setAgreeDiksa] = useState(false);
+  const [agreeBooks, setAgreeBooks] = useState(false);
+  const [agreeGuidelines, setAgreeGuidelines] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -43,7 +56,9 @@ const Auth = () => {
 
   const validateForm = () => {
     const schema = isSignUp ? signUpSchema : signInSchema;
-    const data = isSignUp ? { email, password, name } : { email, password };
+    const data = isSignUp 
+      ? { email, password, name, agreeDiksa, agreeBooks, agreeGuidelines } 
+      : { email, password };
     
     const result = schema.safeParse(data);
     
@@ -117,7 +132,7 @@ const Auth = () => {
             </h1>
             <p className="text-muted-foreground mt-2">
               {isSignUp
-                ? 'Create your profile and connect with members worldwide'
+                ? 'Create your profile and connect with devotees worldwide'
                 : 'Sign in to access your profile and the directory'}
             </p>
           </div>
@@ -186,6 +201,84 @@ const Auth = () => {
                     <p className="text-sm text-destructive">{errors.password}</p>
                   )}
                 </div>
+
+                {/* Agreement Checkboxes for Sign Up */}
+                {isSignUp && (
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    <p className="text-sm font-medium text-foreground">
+                      To join this community, you must agree to the following:
+                    </p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="agreeDiksa"
+                          checked={agreeDiksa}
+                          onCheckedChange={(checked) => setAgreeDiksa(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <label
+                            htmlFor="agreeDiksa"
+                            className="text-sm font-medium leading-relaxed cursor-pointer"
+                          >
+                            I accept His Divine Grace A.C. Bhaktivedanta Swami Prabhupada as my diksa guru
+                          </label>
+                          {errors.agreeDiksa && (
+                            <p className="text-sm text-destructive">{errors.agreeDiksa}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="agreeBooks"
+                          checked={agreeBooks}
+                          onCheckedChange={(checked) => setAgreeBooks(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <label
+                            htmlFor="agreeBooks"
+                            className="text-sm font-medium leading-relaxed cursor-pointer"
+                          >
+                            I follow the teachings from original, pre-1978 books only
+                          </label>
+                          {errors.agreeBooks && (
+                            <p className="text-sm text-destructive">{errors.agreeBooks}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="agreeGuidelines"
+                          checked={agreeGuidelines}
+                          onCheckedChange={(checked) => setAgreeGuidelines(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <label
+                            htmlFor="agreeGuidelines"
+                            className="text-sm font-medium leading-relaxed cursor-pointer"
+                          >
+                            I agree to the{' '}
+                            <Link
+                              to="/guidelines"
+                              className="text-primary hover:underline"
+                              target="_blank"
+                            >
+                              community guidelines
+                            </Link>
+                          </label>
+                          {errors.agreeGuidelines && (
+                            <p className="text-sm text-destructive">{errors.agreeGuidelines}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <Button
                   type="submit"

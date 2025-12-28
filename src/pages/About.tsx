@@ -1,5 +1,7 @@
 import { Layout } from '@/components/layout/Layout';
-import { Heart, Users, Globe, BookOpen } from 'lucide-react';
+import { Heart, Users, Globe, BookOpen, CheckCircle, XCircle, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const About = () => {
   return (
@@ -12,10 +14,119 @@ const About = () => {
               About Sacred Connect
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              A global community platform connecting devotees from around the world, 
-              fostering spiritual growth, and building meaningful connections through 
-              shared devotion and service.
+              A global directory connecting devotees who accept His Divine Grace 
+              A.C. Bhaktivedanta Swami Prabhupada as their diksa guru and follow 
+              the teachings from his original, pre-1978 books.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Who Is This For Section */}
+      <section className="py-16 md:py-20 bg-muted/30">
+        <div className="container px-4 md:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                <Shield className="h-6 w-6 text-primary" />
+              </div>
+              <h2 className="font-serif text-3xl font-semibold text-foreground mb-4">
+                Who Is This Community For?
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Sacred Connect serves a specific community of devotees united by two 
+                fundamental principles.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              {/* Core Requirement 1 */}
+              <div className="p-6 rounded-xl bg-card border border-primary/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <Heart className="h-6 w-6 text-primary" />
+                  <h3 className="font-serif text-xl font-medium text-foreground">
+                    Srila Prabhupada as Diksa Guru
+                  </h3>
+                </div>
+                <p className="text-muted-foreground">
+                  Members accept His Divine Grace A.C. Bhaktivedanta Swami Prabhupada 
+                  as their initiating spiritual master. This is the foundation of our community.
+                </p>
+              </div>
+
+              {/* Core Requirement 2 */}
+              <div className="p-6 rounded-xl bg-card border border-primary/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <BookOpen className="h-6 w-6 text-primary" />
+                  <h3 className="font-serif text-xl font-medium text-foreground">
+                    Original Pre-1978 Books
+                  </h3>
+                </div>
+                <p className="text-muted-foreground">
+                  Members follow the teachings as presented in Srila Prabhupada's original, 
+                  unedited books published before 1978.
+                </p>
+              </div>
+            </div>
+
+            {/* IS For / NOT For Grid */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="p-6 rounded-xl bg-card border border-border/50">
+                <h4 className="flex items-center gap-2 font-medium text-foreground mb-4">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  This Community IS For
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    Devotees accepting Srila Prabhupada as diksa guru
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    Followers of the original, pre-1978 books
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    Those seeking like-minded devotees worldwide
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    Collaborators on mission-aligned projects
+                  </li>
+                </ul>
+              </div>
+
+              <div className="p-6 rounded-xl bg-card border border-destructive/20">
+                <h4 className="flex items-center gap-2 font-medium text-foreground mb-4">
+                  <XCircle className="h-5 w-5 text-destructive" />
+                  This Community is NOT For
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                    Those who do not accept Prabhupada as diksa guru
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                    Promoters of edited/post-1978 book versions
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                    Those seeking to cause division
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                    Information gatherers with contrary purposes
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center mt-8">
+              <Button variant="outline" asChild>
+                <Link to="/guidelines">Read Full Community Guidelines</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
