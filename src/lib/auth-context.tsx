@@ -18,6 +18,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
   isAdmin: boolean;
   isDevotee: boolean;
 }
@@ -128,6 +129,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setHasProfile(false);
   };
 
+  const refreshProfile = async () => {
+    if (user) {
+      const { roleId, exists } = await fetchUserProfile(user.id);
+      setRoleId(roleId);
+      setHasProfile(exists);
+    }
+  };
+
   const isAdmin = roleId === ROLE_IDS.ADMIN;
   const isDevotee = roleId === ROLE_IDS.DEVOTEE || roleId === ROLE_IDS.ADMIN;
 
@@ -142,6 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signIn,
         signOut,
+        refreshProfile,
         isAdmin,
         isDevotee,
       }}
