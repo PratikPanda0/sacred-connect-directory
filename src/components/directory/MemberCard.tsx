@@ -3,6 +3,13 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
+// Role IDs from the roles table
+const ROLE_IDS = {
+  BASIC: 1,
+  DEVOTEE: 2,
+  ADMIN: 3,
+} as const;
+
 interface SocialLinks {
   website?: string;
   linkedin?: string;
@@ -19,7 +26,7 @@ interface MemberCardProps {
   phone?: string;
   socialLinks?: SocialLinks;
   missionDescription?: string;
-  role?: 'admin' | 'member' | 'viewer';
+  roleId?: number;
   avatarUrl?: string;
 }
 
@@ -31,19 +38,19 @@ export const MemberCard = ({
   phone,
   socialLinks,
   missionDescription,
-  role = 'member',
+  roleId = ROLE_IDS.DEVOTEE,
   avatarUrl,
 }: MemberCardProps) => {
   const hasSocialLinks = socialLinks && Object.values(socialLinks).some(Boolean);
 
   const getRoleBadge = () => {
-    switch (role) {
-      case 'admin':
+    switch (roleId) {
+      case ROLE_IDS.ADMIN:
         return <Badge variant="default" className="bg-primary text-primary-foreground">Admin</Badge>;
-      case 'viewer':
-        return <Badge variant="outline" className="text-muted-foreground">Viewer</Badge>;
+      case ROLE_IDS.BASIC:
+        return <Badge variant="outline" className="text-muted-foreground">Basic</Badge>;
       default:
-        return <Badge variant="secondary" className="bg-saffron-light text-saffron-dark">Member</Badge>;
+        return <Badge variant="secondary" className="bg-saffron-light text-saffron-dark">Devotee</Badge>;
     }
   };
 

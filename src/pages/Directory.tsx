@@ -6,6 +6,13 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Users, MapPin, Loader2 } from 'lucide-react';
 
+// Role IDs from the roles table
+const ROLE_IDS = {
+  BASIC: 1,
+  DEVOTEE: 2,
+  ADMIN: 3,
+} as const;
+
 interface Profile {
   id: string;
   user_id: string;
@@ -17,7 +24,7 @@ interface Profile {
   social_links: unknown;
   mission_description: string | null;
   avatar_url: string | null;
-  role?: 'admin' | 'member' | 'viewer';
+  role_id: number;
 }
 
 const Directory = () => {
@@ -58,21 +65,7 @@ const Directory = () => {
       return;
     }
 
-    // Fetch roles for all users
-    const userIds = (profilesData || []).map(p => p.user_id);
-    const { data: rolesData } = await supabase
-      .from('user_roles')
-      .select('user_id, role')
-      .in('user_id', userIds);
-
-    // Map roles to profiles
-    const rolesMap = new Map(rolesData?.map(r => [r.user_id, r.role]) || []);
-    const profilesWithRoles = (profilesData || []).map(p => ({
-      ...p,
-      role: rolesMap.get(p.user_id) || 'member'
-    }));
-
-    setProfiles(profilesWithRoles);
+    setProfiles(profilesData || []);
     setLoading(false);
   };
 
@@ -182,7 +175,7 @@ const Directory = () => {
                         phone={profile.phone || undefined}
                         socialLinks={profile.social_links as Record<string, string> || undefined}
                         missionDescription={profile.mission_description || undefined}
-                        role={profile.role}
+                        roleId={profile.role_id}
                         avatarUrl={profile.avatar_url || undefined}
                       />
                     ))}
