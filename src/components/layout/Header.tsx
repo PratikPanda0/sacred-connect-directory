@@ -6,16 +6,27 @@ import { useState } from 'react';
 import iskconLogo from '@/assets/iskcon-logo.png';
 
 export const Header = () => {
-  const { user, signOut, isAdmin, isMember } = useAuth();
+  const { user, signOut, isAdmin, isDevotee } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
+  // Public links for everyone
+  const publicLinks = [
     { to: '/', label: 'Home' },
-    ...(user ? [
-      { to: '/directory', label: 'Directory' },
-      { to: '/announcements', label: 'Announcements' },
-    ] : []),
+    { to: '/about', label: 'About Us' },
+    { to: '/contact', label: 'Contact Us' },
+  ];
+
+  // Links for Devotees (members) and Admins
+  const devoteeLinks = [
+    { to: '/directory', label: 'Directory' },
+    { to: '/announcements', label: 'Announcements' },
+  ];
+
+  // Combine links based on user role
+  const navLinks = [
+    ...publicLinks,
+    ...(isDevotee ? devoteeLinks : []),
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -61,7 +72,7 @@ export const Header = () => {
                   </Link>
                 </Button>
               )}
-              {isMember && (
+              {isDevotee && (
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/profile">
                     <User className="h-4 w-4 mr-1" />
@@ -126,7 +137,7 @@ export const Header = () => {
                     Admin Dashboard
                   </Link>
                 )}
-                {isMember && (
+                {isDevotee && (
                   <Link
                     to="/profile"
                     onClick={() => setMobileMenuOpen(false)}

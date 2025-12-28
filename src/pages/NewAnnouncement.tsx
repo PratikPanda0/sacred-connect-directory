@@ -35,7 +35,7 @@ const categories = [
 ];
 
 const NewAnnouncement = () => {
-  const { user, isMember, loading: authLoading } = useAuth();
+  const { user, isDevotee, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
