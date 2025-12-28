@@ -6,7 +6,7 @@ interface DevoteeRouteProps {
 }
 
 export const DevoteeRoute = ({ children }: DevoteeRouteProps) => {
-  const { user, loading, isDevotee } = useAuth();
+  const { user, loading, hasProfile } = useAuth();
 
   if (loading) {
     return (
@@ -20,8 +20,9 @@ export const DevoteeRoute = ({ children }: DevoteeRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!isDevotee) {
-    return <Navigate to="/" replace />;
+  // User must create a profile to access protected pages
+  if (!hasProfile) {
+    return <Navigate to="/profile" replace />;
   }
 
   return <>{children}</>;
