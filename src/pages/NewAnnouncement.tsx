@@ -35,7 +35,7 @@ const categories = [
 ];
 
 const NewAnnouncement = () => {
-  const { user, isDevotee, loading: authLoading } = useAuth();
+  const { user, isDevotee, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
@@ -84,14 +84,14 @@ const NewAnnouncement = () => {
       title: title.trim(),
       content: content.trim(),
       category,
-      status: 'pending',
+      status: isAdmin ? 'approved' : 'pending',
     });
 
     if (error) {
       console.error('Error creating announcement:', error);
       toast.error('Failed to submit announcement. Please try again.');
     } else {
-      toast.success('Announcement submitted for review!');
+      toast.success(isAdmin ? 'Announcement published!' : 'Announcement submitted for review!');
       navigate('/announcements');
     }
 
@@ -128,20 +128,22 @@ const NewAnnouncement = () => {
             </p>
           </div>
 
-          <Card className="elevated-card mb-6">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-sage-light/50 border border-primary/20">
-                <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <div className="text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground mb-1">Review Process</p>
-                  <p>
-                    All announcements are reviewed by admins before being published. This typically
-                    takes 24-48 hours.
-                  </p>
+          {!isAdmin && (
+            <Card className="elevated-card mb-6">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-sage-light/50 border border-primary/20">
+                  <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div className="text-sm text-muted-foreground">
+                    <p className="font-medium text-foreground mb-1">Review Process</p>
+                    <p>
+                      All announcements are reviewed by admins before being published. This typically
+                      takes 24-48 hours.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           <form onSubmit={handleSubmit}>
             <Card className="elevated-card">
