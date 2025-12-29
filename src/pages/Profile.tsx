@@ -397,13 +397,12 @@ const Profile = () => {
                   <Label htmlFor="name">Display Name</Label>
                   <Input
                     id="name"
-                    value={formData.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                    placeholder="Your name or initiated name (optional)"
+                    value={user?.user_metadata?.name || ''}
+                    disabled
+                    className="bg-muted cursor-not-allowed"
                   />
-                  {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                   <p className="text-xs text-muted-foreground">
-                    You can use your initiated name or remain anonymous
+                    This is the name you registered with and cannot be changed
                   </p>
                 </div>
 
