@@ -443,15 +443,28 @@ const Profile = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="registered-email">Registered Email</Label>
+                  <Input
+                    id="registered-email"
+                    type="email"
+                    value={user?.email || ''}
+                    disabled
+                    className="bg-muted cursor-not-allowed"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This is your account email and cannot be changed
+                  </p>
+                </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Contact Email (Optional)</Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleChange('email', e.target.value)}
-                      placeholder="contact@example.com"
+                      placeholder="Alternative contact email"
                     />
                     {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                   </div>
