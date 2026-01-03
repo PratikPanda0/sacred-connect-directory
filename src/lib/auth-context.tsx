@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  profileLoading: boolean;
   roleId: number | null;
   hasProfile: boolean;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
@@ -29,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [roleId, setRoleId] = useState<number | null>(null);
   const [hasProfile, setHasProfile] = useState(false);
 
@@ -64,15 +66,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Defer profile fetching to avoid deadlock
         if (session?.user) {
+          setProfileLoading(true);
           setTimeout(() => {
             fetchUserProfile(session.user.id).then(({ roleId, exists }) => {
               setRoleId(roleId);
               setHasProfile(exists);
+              setProfileLoading(false);
             });
           }, 0);
         } else {
           setRoleId(null);
           setHasProfile(false);
+          setProfileLoading(false);
         }
         
         setLoading(false);
@@ -85,13 +90,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        setProfileLoading(true);
         fetchUserProfile(session.user.id).then(({ roleId, exists }) => {
           setRoleId(roleId);
           setHasProfile(exists);
+          setProfileLoading(false);
+          setLoading(false);
         });
+      } else {
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -146,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         session,
         loading,
+        profileLoading,
         roleId,
         hasProfile,
         signUp,

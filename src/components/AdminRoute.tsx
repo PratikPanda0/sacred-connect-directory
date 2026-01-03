@@ -6,9 +6,9 @@ interface AdminRouteProps {
 }
 
 export const AdminRoute = ({ children }: AdminRouteProps) => {
-  const { user, loading, isAdmin, hasProfile } = useAuth();
+  const { user, loading, isAdmin, hasProfile, profileLoading } = useAuth();
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
