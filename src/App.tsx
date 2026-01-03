@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Announcements from "./pages/Announcements";
 import NewAnnouncement from "./pages/NewAnnouncement";
 import Admin from "./pages/Admin";
+import DataExport from "./pages/DataExport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
             
             {/* Admin routes - requires admin role */}
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+            <Route path="/admin/export" element={<AdminRoute><DataExport /></AdminRoute>} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
